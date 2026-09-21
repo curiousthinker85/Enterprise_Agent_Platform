@@ -1,0 +1,2095 @@
+### USER
+i want to build and platform which will help the enterprise and companies to build there local ai agent base on data for hr and finance means my platform will have whole framwork the coampny only have to add model which can be local or api and all other things will be handel my us . so this will be just plugin platform easy to use 
+
+### ASSISTANT
+This is a highly lucrative and timely idea. In the current enterprise AI landscape, companies are desperate for AI agents but are blocked by two things: **data privacy/security concerns** (they don't want to send HR/Finance data to public APIs) and **engineering complexity** (they don't have the team to build RAG pipelines, agent orchestration, and tool integrations from scratch).
+
+By building a **"Bring Your Own Model" (BYOM) Agent Framework**, you are essentially creating an *Enterprise Agent Operating System*. The client provides the "brain" (the model) and the "knowledge" (their data), and you provide the "body" (the framework, tools, memory, and UI).
+
+Here is a comprehensive blueprint on how to architect, build, and position this platform for HR and Finance.
+
+---
+
+### 1. Core Architecture: The "Plugin" Framework
+To make it easy for companies to just "plug in" their model, your platform needs a strict abstraction layer. 
+
+*   **The Model Gateway (The Abstraction Layer):** This is the most critical component. You build a unified API that accepts a prompt and routes it to the client's chosen model. 
+    *   *Local Models:* Integrate with Ollama, vLLM, or llama.cpp so they can host Llama 3, Qwen, or Mistral on their own private servers.
+    *   *API Models:* Allow them to plug in OpenAI, Anthropic, AWS Bedrock, or Azure OpenAI keys.
+    *   *Your job:* Handle the retries, rate limiting, context-window management, and formatting so the rest of your platform doesn't care which model is running.
+*   **The Orchestration Engine:** The logic that handles the agent's "thought process." It manages the flow between the user, the model, the memory, and the tools.
+*   **The RAG (Retrieval-Augmented Generation) Pipeline:** Automated ingestion of their HR manuals, financial policies, and past reports. It handles chunking, embedding (using a local embedding model for privacy), and vector storage.
+*   **The Tool/Action Layer:** Pre-built "plugins" for HR and Finance (e.g., "Query Workday for PTO balance", "Fetch Q3 Invoice from SAP").
+
+### 2. Domain-Specific Features (HR & Finance)
+Enterprise clients won't buy a generic chatbot. They need domain-specific guardrails.
+
+**For HR Agents:**
+*   **PII Masking:** Automatically detect and mask Personally Identifiable Information (SSNs, salaries, home addresses) before it hits the LLM.
+*   **Policy Q&A:** Ingest employee handbooks to answer questions like "What is the maternity leave policy in Germany?"
+*   **Onboarding Workflows:** An agent that guides new hires through paperwork and IT setup.
+
+**For Finance Agents:**
+*   **Strict Guardrails & Math:** LLMs are bad at math. Your framework must include a "Code Interpreter" or "Calculator Tool" so the LLM writes Python/SQL to do the math, rather than guessing the numbers.
+*   **Invoice & Receipt Processing:** OCR integration to extract data from PDFs and match them against ERP systems.
+*   **Audit Trails:** Every single financial query and answer must be logged with a timestamp and user ID for compliance.
+
+### 3. Enterprise-Grade Requirements (The Dealbreakers)
+If you want to sell to enterprises, you must build these features from Day 1, or their security team will reject your platform:
+
+*   **Role-Based Access Control (RBAC) in RAG:** This is crucial. If a junior employee asks the HR agent "What is the CEO's salary?", the RAG pipeline must check the user's permissions *before* retrieving the document containing that data. 
+*   **Data Residency & Air-gapping:** The platform must be deployable entirely within the client's private cloud (AWS VPC, Azure VNET) or on-premise, with zero data leaving their network.
+*   **Human-in-the-Loop (HITL):** For Finance, the agent should *never* execute a payment or alter a ledger autonomously. It should draft the action and require a human to click "Approve."
+
+### 4. Recommended Tech Stack (2026 Standards)
+*   **Backend:** Python (FastAPI) for the AI orchestration and RAG pipeline. Go or Rust for the high-performance Model Gateway if you expect massive concurrency.
+*   **Agent Framework:** Don't build from scratch if you don't have to. Use **LangGraph** or **AutoGen** for complex state management, or build a lightweight custom orchestrator using standard async Python.
+*   **Vector Database:** **Qdrant** or **Milvus** (great for enterprise scale), or **pgvector** (if you want to keep it simple inside PostgreSQL).
+*   **Frontend:** Next.js (React) with Tailwind CSS. Build a clean, Slack-like or Chat-like UI that they can embed into their internal company portals.
+*   **Infrastructure:** Docker and Kubernetes. Provide Helm charts or Terraform scripts so their DevOps team can deploy your platform in 15 minutes.
+
+### 5. Step-by-Step Execution Plan
+
+**Phase 1: The "Headless" Engine (Weeks 1-4)**
+*   Build the Model Gateway. Prove that you can swap between a local Ollama instance and an OpenAI API key seamlessly without changing the backend code.
+*   Build a basic RAG pipeline (PDF upload -> Chunk -> Embed -> Chat).
+
+**Phase 2: The UI & HR/Finance Templates (Weeks 5-8)**
+*   Build the frontend dashboard. 
+*   Create "Templates." When a user selects "HR Template," the system automatically loads HR-specific system prompts, HR-specific tools (like a PTO calculator), and HR-specific document parsers.
+
+**Phase 3: Enterprise Integrations (Weeks 9-12)**
+*   Build connectors for common enterprise tools. (e.g., a generic SQL database connector, a REST API connector, and specific plugins for Jira, Slack, or basic HRIS/ERP systems).
+*   Implement SSO (Single Sign-On) via SAML/OIDC.
+
+**Phase 4: Security & Compliance (Weeks 13-16)**
+*   Implement document-level RBAC (Row-level security for vectors).
+*   Build the audit logging dashboard.
+*   Get SOC2 Type 1 compliance (or prepare the documentation for it).
+
+### 6. Your Go-To-Market (GTM) Strategy
+Don't sell it as "an AI platform." Sell it as **"A secure, private AI employee for your HR and Finance teams."**
+
+*   **Target Audience:** Chief Human Resources Officers (CHROs), Chief Financial Officers (CFOs), and IT/Security Directors.
+*   **The Pitch:** *"Your team spends 30% of their time answering repetitive HR questions and chasing down financial receipts. Our platform gives you a secure, private AI agent to handle this. You bring your own secure LLM, we provide the enterprise framework, integrations, and security. Deployed in your private cloud in under an hour."*
+*   **Pricing Model:** Charge a platform licensing fee (per seat or flat enterprise fee) + implementation/setup fees. Do not charge for the LLM tokens, as they are using their own models.
+
+### The Biggest Pitfall to Avoid
+**Do not let the LLM hallucinate financial or HR data.** 
+In HR, a hallucinated answer about benefits can cause legal issues. In Finance, a hallucinated number can cause accounting errors. Your framework *must* heavily rely on RAG (citing the exact page and paragraph of the source document) and force the LLM to say "I don't know" if the context doesn't contain the answer. Implement strict "Faithfulness" evaluation metrics in your testing pipeline.
+
+### USER
+see i am not saying abot hr chatbot , the usecase i have find out is hr want to find something about the employee like new joinee and backgroung verification so they can upload the document and ask there dought and for finance it can like all sales and related docs for there queries audit team also
+
+### ASSISTANT
+This is a **much stronger and more valuable** use case. You are not building a generic "chatbot"; you are building an **Automated Document Intelligence & Due Diligence Platform**. 
+
+Enterprises struggle massively with manual document review. HR spends hours cross-referencing resumes with background checks, and Audit teams drown in sales invoices, receipts, and bank statements. 
+
+By providing the framework where they just "upload docs + plug in a model + ask questions," you are solving a high-pain, high-value problem. Here is how you should architect and position your platform specifically for **HR Vetting** and **Finance/Audit** document workflows.
+
+---
+
+### 1. The Core Workflows (How it works in practice)
+
+**HR Use Case: New Joinee Vetting**
+*   **Action:** HR uploads a candidate’s Resume, ID Proof, and 3rd-party Background Verification Report into a secure "Candidate Folder."
+*   **Query:** *"Are there any discrepancies in the employment dates or job titles between the resume and the background check report?"*
+*   **Agent Action:** The agent reads Document A, extracts the timeline, reads Document B, extracts the timeline, compares them, and outputs: *"Yes, discrepancy found. Resume lists 'Senior Developer' at Company X from Jan 2020–Dec 2022. Background report lists 'Junior Developer' from Mar 2020–Dec 2022."*
+*   **Output:** Highlights the exact pages and paragraphs where the data was found.
+
+**Finance/Audit Use Case: Sales & Invoice Auditing**
+*   **Action:** Audit team uploads a batch of 50 sales invoices, a general ledger export (CSV), and a bank statement (PDF) for Q3.
+*   **Query:** *"Flag any invoices over $10,000 that do not have a corresponding matching transaction in the bank statement."*
+*   **Agent Action:** The agent uses a "Table Extraction Tool" to read the invoices, queries the CSV ledger, cross-references the bank statement, and returns a precise list of flagged invoice numbers with reasons.
+
+---
+
+### 2. The "Framework" You Provide (Your Product's Core)
+
+Since the client only brings the model and the data, your platform must excel at these four pillars:
+
+#### A. Advanced Document Parsing (The Most Critical Layer)
+Standard RAG fails on financial tables and multi-column resumes. Your framework must include robust parsing plugins:
+*   **Table Extraction:** Ability to accurately read tabular data from invoices and bank statements.
+*   **OCR & Handwriting Support:** For scanned documents or signed forms.
+*   *Recommendation:* Integrate parsers like **LlamaParse**, **Unstructured.io**, or **Azure Document Intelligence** as a core part of your framework.
+
+#### B. Agentic Cross-Document Reasoning
+A simple vector search won't work for "compare Document A and Document B." Your framework needs an **Agentic Orchestrator** (e.g., using LangGraph or a custom state machine) that can:
+1. Break the user's query into sub-tasks.
+2. Search Document A for specific entities.
+3. Search Document B for those same entities.
+4. Synthesize and compare the results.
+
+#### C. Bulletproof Citations & "Show Your Work"
+For HR and Audit, **trust is everything**. The AI cannot just give an answer; it must prove it.
+*   Every claim the agent makes must have a clickable footnote linking to the exact page and highlighted text in the original uploaded document.
+*   Include a "Confidence Score" or a "Source Verification" tag for every answer.
+
+#### D. Strict Data Compartmentalization (Security)
+*   **Folder-Level Isolation:** A "Candidate Folder" or "Audit Folder" must be strictly isolated. 
+*   **RBAC (Role-Based Access Control):** Only the assigned HR manager or Lead Auditor can query or view the documents in that specific folder. The AI must respect these permissions at the retrieval level.
+
+---
+
+### 3. The "Plugin" Architecture (What the Client Configures)
+
+To keep it "easy to use," your platform’s settings page should have clear, modular slots for the client to fill:
+
+1. **Model Plugin:** 
+   * *Option A (Local/Privacy):* Endpoint URL for their internal Ollama/vLLM server (e.g., hosting Llama-3-70B or Qwen locally).
+   * *Option B (Cloud/API):* API Key for Azure OpenAI, AWS Bedrock, or Anthropic.
+2. **Embedding Plugin:** Choice of embedding model (crucial: if they choose a local LLM, they should ideally use a local embedding model like `nomic-embed-text` to keep data entirely on-premise).
+3. **Storage Plugin:** Where the parsed data lives (e.g., their own AWS S3 bucket + their own Qdrant/Milvus vector database, or your managed secure storage).
+4. **Document Parser Plugin:** Toggle between standard text extraction or advanced table/OCR extraction.
+
+---
+
+### 4. Recommended Tech Stack for This Specific Niche
+
+*   **Backend:** Python (FastAPI) – essential for AI orchestration and document processing libraries.
+*   **Agent Orchestration:** **LangGraph** (highly recommended for multi-step, cross-document reasoning workflows) or **CrewAI**.
+*   **Document Parsing:** **LlamaParse** (excellent for complex PDFs and tables) or **Unstructured.io**.
+*   **Vector Database:** **Qdrant** or **pgvector** (PostgreSQL). pgvector is often preferred by enterprises because it keeps vector data in the same secure database as their relational metadata.
+*   **Frontend:** Next.js with a clean, split-screen UI: *Left side = Chat/Query interface; Right side = Document viewer with highlighted citations.*
+*   **Deployment:** Docker + Helm Charts. Allow them to deploy the entire stack into their own AWS/Azure VPC with one click.
+
+---
+
+### 5. Go-To-Market & Positioning Strategy
+
+Do not call it an "AI Chatbot Platform." Call it an **"Intelligent Document Review & Audit Agent."**
+
+*   **Target Buyers:** Head of Talent Acquisition, HR Operations Directors, Internal Audit Managers, and CFOs.
+*   **The Pitch:** *"Reduce document review time by 80%. Upload resumes, background checks, or financial statements, and let our secure AI agent cross-reference, flag discrepancies, and answer your queries instantly. You bring your own secure AI model; we provide the enterprise-grade document intelligence framework."*
+*   **Pricing:** Tiered based on volume (e.g., number of documents processed per month, or number of active "Audit/HR Workspaces"). Charge a premium for the advanced table-parsing and cross-referencing features.
+
+### ⚠️ The Biggest Technical Challenge to Solve Early
+**Hallucination in Data Extraction.** If the AI misreads an invoice number or a date on a background check, it breaks trust immediately. 
+*   **Solution:** Implement a "Self-Correction" or "Validator" step in your agent framework. For example, when the agent extracts a date or number, have a secondary, lightweight prompt verify: *"Double-check the extracted date against the raw text of the document. Is it 100% accurate?"* before showing it to the user.
+
+This refined focus makes your platform highly defensible. You aren't competing with generic chatbots; you are building a specialized, high-ROI tool for compliance, HR ops, and finance teams.
+
+### USER
+we can make both plateforms lets start with it
+
+### ASSISTANT
+This is a fantastic decision. The two concepts are perfectly synergistic: **The Framework is the engine**, and **The Document Review/Audit Agent is the killer feature** that will get you your first enterprise customers. 
+
+Let’s stop planning and start building. To avoid getting overwhelmed, we will build a **30-Day MVP (Minimum Viable Product)** that proves the core value: *A user uploads documents, selects a model (local or API), and asks cross-document questions with citations.*
+
+Here is your actionable, step-by-step launch plan.
+
+---
+
+### 🗓️ Phase 1: The 30-Day MVP Roadmap
+
+#### **Week 1: The "Plugin" Model Gateway (The Core Promise)**
+*   **Goal:** Build a unified backend API that can talk to *any* model the user chooses, proving the "Bring Your Own Model" concept.
+*   **Tasks:**
+    1. Set up a Python FastAPI project.
+    2. Create a unified `/chat` endpoint.
+    3. Integrate **LiteLLM** or a custom router to handle both local models (via Ollama/vLLM) and cloud APIs (OpenAI, Azure, Anthropic) using the exact same input/output format.
+*   **Deliverable:** A working API where you can switch the model by just changing a config variable, without changing the code.
+
+#### **Week 2: Document Ingestion & Parsing Pipeline**
+*   **Goal:** Allow users to upload PDFs/CSVs and turn them into AI-readable formats, especially handling tables (crucial for finance/HR).
+*   **Tasks:**
+    1. Set up an S3-compatible storage (or local MinIO for MVP) for raw file uploads.
+    2. Integrate a parser like **LlamaParse** (best for complex PDFs/tables) or **Unstructured.io**.
+    3. Chunk the parsed text and generate embeddings.
+    4. Store vectors and metadata (file name, page number, user ID) in **Qdrant** or **pgvector**.
+*   **Deliverable:** An API endpoint `/upload` that takes a PDF, parses it, and stores it in the vector database with page-level metadata.
+
+#### **Week 3: Agentic Cross-Document Reasoning (The "Magic")**
+*   **Goal:** Move beyond basic RAG. Enable the AI to compare Document A and Document B.
+*   **Tasks:**
+    1. Implement **LangGraph** (or a custom state machine) for the agent workflow.
+    2. Create a "Router" node: Does this query require a simple search, or a multi-document comparison?
+    3. Build a "Citation" formatter: Ensure every answer includes `[Source: Document_Name.pdf, Page X]`.
+*   **Deliverable:** A backend workflow that can accurately answer: *"Does the employment date in the Resume match the Background Check?"* and cite both documents.
+
+#### **Week 4: Basic UI & Security Compartmentalization**
+*   **Goal:** A clean, usable interface with basic enterprise security.
+*   **Tasks:**
+    1. Build a simple Next.js frontend: Left panel = Chat, Right panel = PDF Viewer with highlight capability.
+    2. Implement "Workspace" or "Folder" logic: Documents uploaded to "HR Folder A" cannot be queried by someone without access to that folder.
+*   **Deliverable:** A clickable, demonstrable MVP you can show to a potential HR or Audit client.
+
+---
+
+### 🛠️ Locked-In Tech Stack for Speed & Enterprise Readiness
+*   **Backend:** Python + FastAPI (Fast, async, perfect for AI).
+*   **Agent Framework:** LangGraph (Best for controlled, multi-step reasoning and citations).
+*   **Model Router:** LiteLLM (Handles 100+ model providers with a single OpenAI-compatible API).
+*   **Document Parsing:** LlamaParse (by LlamaIndex) – specifically built for complex, table-heavy PDFs.
+*   **Vector Database:** Qdrant (Fast, easy to dockerize, great metadata filtering for RBAC).
+*   **Frontend:** Next.js + Tailwind CSS + `react-pdf` (for rendering and highlighting documents).
+*   **Local Model Hosting (for client demos):** Ollama (running `llama3:8b` or `qwen2.5:14b` for fast, local testing).
+
+---
+
+### 💻 Let's Write the First Piece of Code: The Model Gateway
+
+To prove the "plugin" concept immediately, here is the foundational FastAPI code for your **Unified Model Gateway**. This allows the client to switch between a local Ollama model and an OpenAI model seamlessly.
+
+*First, install dependencies:* `pip install fastapi uvicorn litellm pydantic`
+
+```python
+# main.py
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from litellm import completion
+import os
+
+app = FastAPI(title="Enterprise AI Agent Gateway")
+
+# Configuration model (This is what the client "plugins" in)
+class ModelConfig(BaseModel):
+    provider: str  # e.g., "openai", "ollama", "azure"
+    model_name: str  # e.g., "gpt-4o", "llama3", "azure/gpt-4"
+    api_key: str | None = None  # Optional for local models
+    api_base: str | None = None  # Required for local Ollama/vLLM (e.g., "http://localhost:11434")
+
+class ChatRequest(BaseModel):
+    messages: list[dict]  # [{"role": "user", "content": "Compare these two docs..."}]
+    config: ModelConfig
+    workspace_id: str  # For future RBAC/logging
+
+@app.post("/api/v1/chat")
+async def chat_endpoint(request: ChatRequest):
+    try:
+        # LiteLLM standardizes the call across ALL providers
+        response = completion(
+            model=request.config.model_name,
+            messages=request.messages,
+            api_key=request.config.api_key,
+            api_base=request.config.api_base,
+            temperature=0.1 # Low temperature for HR/Finance accuracy
+        )
+        
+        return {
+            "success": True,
+            "response": response.choices[0].message.content,
+            "model_used": response.model,
+            "workspace_id": request.workspace_id
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Model inference failed: {str(e)}")
+
+# Run with: uvicorn main:app --reload
+```
+
+**Why this is powerful:** Your entire platform's frontend and agent logic only ever talks to *this* `/api/v1/chat` endpoint. If the client wants to switch from OpenAI to a locally hosted Qwen model for data privacy, they just change the `provider`, `model_name`, and `api_base` in the config. The rest of your platform doesn't need to change a single line of code.
+
+---
+
+### 🚀 Your Immediate Next Step
+
+We need to pick **one** thing to build next to keep momentum. Which of these do you want to tackle right now?
+
+1. **The Document Parser:** Write the code to upload a PDF, extract text/tables (using LlamaParse or Unstructured), and save it to Qdrant with page numbers.
+2. **The Agent Logic:** Build the LangGraph workflow that takes a user query, searches the vector DB, and formats the answer with strict citations.
+3. **The Frontend:** Scaffold the Next.js UI with a split-screen chat and document viewer.
+
+Tell me which one (1, 2, or 3), and I will generate the exact code, setup instructions, and file structure for it. Let's build this.
+
+### USER
+lets go one by one with proper flow start building it and also tell me what you are build and how and what u using why u choose this check is it correct so while building i also get the code base knowledge and idea why we using this function and all the details
+
+### ASSISTANT
+Perfect. We will go **one by one**, with a proper flow. At every step I will tell you:
+
+1. **What we are building**
+2. **Why we are building it**
+3. **How we are building it**
+4. **Which technology we are using**
+5. **Why we chose that technology**
+6. **How to check whether it is correct**
+7. **What comes next**
+
+We will build this like a real product, not just random code.
+
+---
+
+# Overall Build Flow
+
+Our final platform will allow companies to:
+
+- Create secure workspaces like:
+  - HR onboarding workspace
+  - Background verification workspace
+  - Finance audit workspace
+  - Sales document workspace
+- Upload documents:
+  - Resume
+  - ID proof
+  - Offer letter
+  - Background verification report
+  - Invoices
+  - Sales orders
+  - Bank statements
+  - Contracts
+- Plug in their own model:
+  - Local model using Ollama / vLLM
+  - API model using OpenAI / Azure / Anthropic / Bedrock
+- Ask questions across documents
+- Get answers with citations
+- Maintain audit logs and permissions
+
+But we will not build everything at once.
+
+## MVP Build Order
+
+### Step 1: Backend Foundation + BYOM Model Gateway
+Build the core “plugin model” system.
+
+### Step 2: Workspace + Document Storage
+Allow users/folders/documents to be created and stored securely.
+
+### Step 3: Document Parsing + Vector Indexing
+Convert PDFs, CSVs, scans, tables into searchable AI context.
+
+### Step 4: Agent Reasoning + Citations
+Build the HR/Finance agent that can compare documents and answer safely.
+
+### Step 5: Basic UI
+Chat interface + document viewer + citation highlighting.
+
+### Step 6: Auth, RBAC, Audit Logs
+Make it enterprise-ready.
+
+### Step 7: Deployment Package
+Docker/Kubernetes/Helm for private enterprise deployment.
+
+Today we start with **Step 1**.
+
+---
+
+# Step 1: Backend Foundation + BYOM Model Gateway
+
+## What are we building?
+
+We are building the backend core of the platform.
+
+This first version will:
+
+- Start a FastAPI backend
+- Expose health check API
+- Expose model configuration info
+- Expose a chat API
+- Route chat requests to either:
+  - a local model, for example Ollama
+  - or an API model, for example OpenAI
+
+This proves the main promise of your platform:
+
+> The company only needs to provide the model. Our platform handles the agent framework.
+
+---
+
+## Why this step first?
+
+Because your platform’s biggest differentiator is the **Model Plugin Gateway**.
+
+If we cannot cleanly support:
+
+- local model
+- API model
+- future Azure model
+- future Bedrock model
+
+then the rest of the platform becomes messy.
+
+So first we build the abstraction layer.
+
+---
+
+# Architecture of Step 1
+
+```text
+Frontend / Postman / Client
+        |
+        v
+FastAPI Routes
+        |
+        v
+Pydantic Schemas
+        |
+        v
+LLM Gateway Service
+        |
+        v
+LiteLLM
+        |
+        v
+Local Model / Cloud Model API
+```
+
+---
+
+## Folder-based explanation
+
+```text
+backend/
+├── app/
+│   ├── main.py
+│   ├── core/
+│   │   ├── config.py
+│   │   └── logging.py
+│   ├── schemas/
+│   │   └── chat.py
+│   ├── services/
+│   │   └── llm_gateway.py
+│   └── api/
+│       └── routes/
+│           ├── health.py
+│           └── models.py
+├── tests/
+│   ├── test_health.py
+│   └── test_llm_gateway.py
+├── .env.example
+├── requirements.txt
+└── README.md
+```
+
+---
+
+# Technology Choices for Step 1
+
+| Technology | Why we chose it |
+|---|---|
+| Python | Best ecosystem for AI, document processing, LangChain/LangGraph, vector databases |
+| FastAPI | Modern, fast, async, automatic API docs, strong validation |
+| Pydantic | Type-safe request/response validation |
+| Pydantic Settings | Clean environment configuration |
+| LiteLLM | Lets us support many model providers through one interface |
+| Uvicorn | ASGI server to run FastAPI |
+| pytest | Simple testing framework |
+
+---
+
+## Why FastAPI?
+
+FastAPI is suitable because:
+
+- It is async-native.
+- AI model calls are usually I/O-bound.
+- It gives automatic Swagger docs at `/docs`.
+- It validates input using Pydantic.
+- It is widely used for production AI APIs.
+
+---
+
+## Why LiteLLM?
+
+LiteLLM gives us a unified interface.
+
+Instead of writing separate code for:
+
+```python
+OpenAI SDK
+Anthropic SDK
+Azure SDK
+Ollama client
+AWS Bedrock client
+```
+
+we can use one standard call pattern.
+
+This is important because your platform promise is:
+
+> Company can plug in local or API model easily.
+
+LiteLLM helps us achieve that quickly.
+
+---
+
+# Let’s Build Step 1
+
+Create project folder.
+
+```bash
+mkdir enterprise-agent-platform
+cd enterprise-agent-platform
+mkdir backend
+cd backend
+```
+
+Create virtual environment.
+
+### macOS/Linux
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### Windows PowerShell
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+
+### Windows CMD
+
+```cmd
+python -m venv .venv
+.venv\Scripts\activate.bat
+```
+
+---
+
+# Create `requirements.txt`
+
+```txt
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+litellm
+python-dotenv
+httpx
+pytest
+pytest-asyncio
+```
+
+Install:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+# Create Folder Structure
+
+Inside `backend/`:
+
+```bash
+mkdir app
+mkdir app/core
+mkdir app/schemas
+mkdir app/services
+mkdir app/api
+mkdir app/api/routes
+mkdir tests
+```
+
+Create empty init files:
+
+```bash
+touch app/__init__.py
+touch app/core/__init__.py
+touch app/schemas/__init__.py
+touch app/services/__init__.py
+touch app/api/__init__.py
+touch app/api/routes/__init__.py
+```
+
+On Windows, you can simply create empty files manually:
+
+```text
+app/__init__.py
+app/core/__init__.py
+app/schemas/__init__.py
+app/services/__init__.py
+app/api/__init__.py
+app/api/routes/__init__.py
+```
+
+---
+
+# 1. Configuration File
+
+Create:
+
+```text
+backend/app/core/config.py
+```
+
+Code:
+
+```python
+from functools import lru_cache
+from typing import Literal
+
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    """
+    Application settings loaded from environment variables.
+
+    Why this file exists:
+    ---------------------
+    We never want hardcoded secrets, model names, or environment values
+    inside business logic. All configuration should come from one place.
+
+    This makes the platform easier to deploy for enterprises:
+    - dev environment
+    - staging environment
+    - production/private cloud environment
+    """
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+    # Application metadata
+    app_name: str = "Enterprise Agent Platform"
+    app_version: str = "0.1.0"
+    environment: Literal["dev", "staging", "prod"] = "dev"
+    log_level: str = "INFO"
+
+    # CORS
+    # In production, replace this with exact frontend domains.
+    cors_origins: list[str] = Field(
+        default_factory=lambda: ["http://localhost:3000"]
+    )
+
+    # Default LLM configuration
+    # This is the "Bring Your Own Model" plugin configuration.
+    default_llm_provider: str = "openai"
+    default_llm_model: str = "gpt-4o-mini"
+    default_llm_api_key: str | None = None
+    default_llm_api_base: str | None = None
+    default_llm_api_version: str | None = None
+
+    # LLM behaviour
+    # HR and Finance need factual accuracy, so low temperature is safer.
+    llm_temperature: float = 0.1
+    llm_max_tokens: int | None = 1024
+    request_timeout_seconds: int = 60
+
+    @property
+    def is_production(self) -> bool:
+        return self.environment == "prod"
+
+
+@lru_cache
+def get_settings() -> Settings:
+    """
+    Cached settings loader.
+
+    Why lru_cache?
+    --------------
+    We do not want to read and parse .env repeatedly for every request.
+    This function loads settings once and reuses them.
+    """
+    return Settings()
+```
+
+## Why this design?
+
+We use a `Settings` class because:
+
+- environment variables become typed Python fields
+- mistakes are caught early
+- secrets are not scattered across files
+- deployment becomes easier
+
+Example:
+
+```env
+DEFAULT_LLM_MODEL=gpt-4o-mini
+```
+
+becomes:
+
+```python
+settings.default_llm_model
+```
+
+instead of unsafe:
+
+```python
+os.getenv("DEFAULT_LLM_MODEL")
+```
+
+---
+
+# 2. Logging Setup
+
+Create:
+
+```text
+backend/app/core/logging.py
+```
+
+Code:
+
+```python
+import logging
+import sys
+
+from app.core.config import get_settings
+
+
+def configure_logging() -> None:
+    """
+    Central logging configuration.
+
+    Why logging matters in this platform:
+    -------------------------------------
+    For HR and Finance use cases, auditability is critical.
+
+    Even in MVP, we should start with proper logging because later we need:
+    - model call logs
+    - document access logs
+    - user query logs
+    - error debugging
+    - compliance evidence
+    """
+    settings = get_settings()
+
+    logging.basicConfig(
+        level=settings.log_level,
+        format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+        stream=sys.stdout,
+    )
+
+    # Reduce noisy uvicorn logs if needed.
+    logging.getLogger("uvicorn.access").setLevel(settings.log_level)
+```
+
+## Why logging now?
+
+Because enterprise products need traceability.
+
+Later, when a finance auditor asks:
+
+> Why did the AI say this invoice is mismatched?
+
+we need logs to debug and prove behaviour.
+
+---
+
+# 3. Chat Schemas
+
+Create:
+
+```text
+backend/app/schemas/chat.py
+```
+
+Code:
+
+```python
+from typing import Any, Literal
+
+from pydantic import BaseModel, Field
+
+
+class ChatMessage(BaseModel):
+    """
+    Single chat message.
+
+    Why validate role?
+    ------------------
+    LLM providers expect roles like:
+    - system
+    - user
+    - assistant
+
+    If invalid role comes, we reject it before calling the model.
+    This saves cost and prevents confusing provider errors.
+    """
+
+    role: Literal["system", "user", "assistant"]
+    content: str
+
+
+class ChatRequest(BaseModel):
+    """
+    Incoming chat request.
+
+    Design decision:
+    ----------------
+    For MVP, model can be overridden per request.
+
+    In production enterprise version:
+    - API keys should not come from every request
+    - model profiles should be stored securely
+    - users should select a permitted model profile
+    """
+
+    messages: list[ChatMessage] = Field(..., min_length=1)
+    model: str | None = None
+    temperature: float | None = Field(default=None, ge=0, le=2)
+    max_tokens: int | None = Field(default=None, gt=0)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class Usage(BaseModel):
+    """
+    Token usage information.
+
+    Why track usage?
+    ----------------
+    Enterprises need cost visibility.
+    Later we can show:
+    - tokens used by HR workspace
+    - tokens used by finance audit workspace
+    - model-wise cost estimates
+    """
+
+    prompt_tokens: int | None = None
+    completion_tokens: int | None = None
+    total_tokens: int | None = None
+
+
+class ChatResponse(BaseModel):
+    """
+    Standardized chat response.
+
+    Why standardize?
+    ----------------
+    Whether the client uses OpenAI, Ollama, Azure, or Anthropic,
+    our frontend should receive the same response shape.
+    """
+
+    id: str | None = None
+    model: str
+    content: str
+    usage: Usage | None = None
+    provider: str | None = None
+
+
+class ModelTestResponse(BaseModel):
+    ok: bool
+    model: str
+    message: str
+```
+
+## Why schemas are important
+
+Schemas act like a contract.
+
+They answer:
+
+- What input is allowed?
+- What output will the client receive?
+- What should be validated?
+- What should be rejected?
+
+Example:
+
+If someone sends:
+
+```json
+{
+  "messages": []
+}
+```
+
+FastAPI rejects it because:
+
+```python
+min_length=1
+```
+
+This protects the LLM gateway from useless calls.
+
+---
+
+# 4. LLM Gateway Service
+
+Create:
+
+```text
+backend/app/services/llm_gateway.py
+```
+
+Code:
+
+```python
+import logging
+from typing import Any
+
+import litellm
+from litellm import acompletion
+
+from app.core.config import Settings, get_settings
+from app.schemas.chat import ChatRequest, ChatResponse, Usage
+
+
+logger = logging.getLogger(__name__)
+
+# Useful for provider compatibility.
+# If a provider does not support a parameter, LiteLLM can drop it instead of failing.
+litellm.drop_params = True
+
+
+class LLMGatewayError(Exception):
+    """
+    Custom exception for model gateway failures.
+
+    Why custom exception?
+    ---------------------
+    We want to separate infrastructure/model errors from normal validation errors.
+    Later, routes can convert this into proper HTTP 502/503 responses.
+    """
+
+    pass
+
+
+class LLMGateway:
+    """
+    Bring Your Own Model gateway.
+
+    Responsibility:
+    ---------------
+    Convert our internal chat request into a provider-compatible LLM call.
+
+    This is the heart of your platform's plugin idea.
+    """
+
+    def __init__(self, settings: Settings | None = None) -> None:
+        self.settings = settings or get_settings()
+
+    def _build_kwargs(self, request: ChatRequest) -> dict[str, Any]:
+        """
+        Build LiteLLM keyword arguments.
+
+        Why separate method?
+        --------------------
+        This makes the code testable.
+        We can test request-to-provider mapping without actually calling OpenAI/Ollama.
+        """
+
+        model = request.model or self.settings.default_llm_model
+
+        if not model:
+            raise LLMGatewayError(
+                "No model configured. Please set DEFAULT_LLM_MODEL or provide model in request."
+            )
+
+        kwargs: dict[str, Any] = {
+            "model": model,
+            "messages": [message.model_dump() for message in request.messages],
+            "temperature": (
+                request.temperature
+                if request.temperature is not None
+                else self.settings.llm_temperature
+            ),
+            "timeout": self.settings.request_timeout_seconds,
+        }
+
+        max_tokens = (
+            request.max_tokens
+            if request.max_tokens is not None
+            else self.settings.llm_max_tokens
+        )
+
+        if max_tokens:
+            kwargs["max_tokens"] = max_tokens
+
+        if self.settings.default_llm_api_key:
+            kwargs["api_key"] = self.settings.default_llm_api_key
+
+        if self.settings.default_llm_api_base:
+            kwargs["api_base"] = self.settings.default_llm_api_base
+
+        if self.settings.default_llm_api_version:
+            kwargs["api_version"] = self.settings.default_llm_api_version
+
+        return kwargs
+
+    async def chat(self, request: ChatRequest) -> ChatResponse:
+        """
+        Send chat request to configured model.
+
+        Flow:
+        -----
+        1. Build provider kwargs
+        2. Call LiteLLM async completion
+        3. Normalize response
+        4. Return standard ChatResponse
+        """
+
+        kwargs = self._build_kwargs(request)
+        model = kwargs["model"]
+
+        logger.info("Calling LLM gateway | model=%s", model)
+
+        try:
+            response = await acompletion(**kwargs)
+        except Exception as exc:
+            logger.exception("LLM gateway call failed | model=%s", model)
+            raise LLMGatewayError(str(exc)) from exc
+
+        choice = response.choices[0]
+        content = choice.message.content or ""
+
+        usage_raw = getattr(response, "usage", None)
+        usage = None
+
+        if usage_raw:
+            usage = Usage(
+                prompt_tokens=getattr(usage_raw, "prompt_tokens", None),
+                completion_tokens=getattr(usage_raw, "completion_tokens", None),
+                total_tokens=getattr(usage_raw, "total_tokens", None),
+            )
+
+        return ChatResponse(
+            id=getattr(response, "id", None),
+            model=getattr(response, "model", model),
+            content=content,
+            usage=usage,
+            provider=self.settings.default_llm_provider,
+        )
+
+
+_gateway: LLMGateway | None = None
+
+
+def get_gateway() -> LLMGateway:
+    """
+    Dependency provider for FastAPI.
+
+    Why singleton-style?
+    --------------------
+    We do not need to recreate gateway object for every request.
+    Later this can be extended with connection pooling, retry policy, metrics, etc.
+    """
+
+    global _gateway
+
+    if _gateway is None:
+        _gateway = LLMGateway()
+
+    return _gateway
+```
+
+## Why this file is important
+
+This is your platform’s **model plugin layer**.
+
+Later, when you add:
+
+- Ollama
+- vLLM
+- OpenAI
+- Azure OpenAI
+- AWS Bedrock
+- Anthropic
+
+most of your application should continue working because they all go through this gateway.
+
+---
+
+# 5. Health Route
+
+Create:
+
+```text
+backend/app/api/routes/health.py
+```
+
+Code:
+
+```python
+from fastapi import APIRouter, Depends
+
+from app.core.config import Settings, get_settings
+
+router = APIRouter(tags=["health"])
+
+
+@router.get("/health")
+def health_check(settings: Settings = Depends(get_settings)) -> dict:
+    """
+    Simple health endpoint.
+
+    Why needed?
+    -----------
+    - Deployment readiness check
+    - Load balancer health check
+    - Docker/Kubernetes probe
+    - Quick confirmation that backend is alive
+    """
+
+    return {
+        "status": "ok",
+        "app": settings.app_name,
+        "version": settings.app_version,
+        "environment": settings.environment,
+    }
+```
+
+---
+
+# 6. Model Routes
+
+Create:
+
+```text
+backend/app/api/routes/models.py
+```
+
+Code:
+
+```python
+from fastapi import APIRouter, Depends, HTTPException
+
+from app.core.config import Settings, get_settings
+from app.schemas.chat import (
+    ChatMessage,
+    ChatRequest,
+    ChatResponse,
+    ModelTestResponse,
+)
+from app.services.llm_gateway import LLMGateway, LLMGatewayError, get_gateway
+
+router = APIRouter(prefix="/models", tags=["models"])
+
+
+@router.get("/config")
+def get_model_config(settings: Settings = Depends(get_settings)) -> dict:
+    """
+    Returns safe model configuration.
+
+    Security rule:
+    --------------
+    Never return actual API key.
+    Only return whether it is configured.
+    """
+
+    return {
+        "default_provider": settings.default_llm_provider,
+        "default_model": settings.default_llm_model,
+        "api_base_configured": bool(settings.default_llm_api_base),
+        "api_key_configured": bool(settings.default_llm_api_key),
+        "temperature": settings.llm_temperature,
+        "max_tokens": settings.llm_max_tokens,
+    }
+
+
+@router.post("/test", response_model=ModelTestResponse)
+async def test_model(
+    gateway: LLMGateway = Depends(get_gateway),
+) -> ModelTestResponse:
+    """
+    Tests whether the configured model is reachable.
+
+    Why useful?
+    -----------
+    Enterprise customers often host local models.
+    Before uploading sensitive HR/Finance documents, they should be able to
+    verify:
+    - model is running
+    - API is reachable
+    - gateway can call it
+    """
+
+    request = ChatRequest(
+        messages=[
+            ChatMessage(
+                role="user",
+                content="Reply only with: OK",
+            )
+        ],
+        max_tokens=5,
+    )
+
+    try:
+        response = await gateway.chat(request)
+    except LLMGatewayError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    return ModelTestResponse(
+        ok=True,
+        model=response.model,
+        message=response.content.strip(),
+    )
+
+
+@router.post("/chat", response_model=ChatResponse)
+async def chat(
+    request: ChatRequest,
+    gateway: LLMGateway = Depends(get_gateway),
+) -> ChatResponse:
+    """
+    Main chat endpoint.
+
+    This endpoint will later be used by:
+    - HR document agent
+    - Finance audit agent
+    - background verification comparison agent
+    """
+
+    try:
+        return await gateway.chat(request)
+    except LLMGatewayError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+```
+
+---
+
+# 7. Main FastAPI App
+
+Create:
+
+```text
+backend/app/main.py
+```
+
+Code:
+
+```python
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
+from app.api.routes import health, models
+from app.core.config import get_settings
+from app.core.logging import configure_logging
+from app.services.llm_gateway import LLMGatewayError
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Lifespan events.
+
+    Why use lifespan?
+    -----------------
+    This is the modern FastAPI way to run startup/shutdown logic.
+
+    Currently:
+    - configure logging on startup
+
+    Later:
+    - connect database
+    - initialize vector store
+    - warm up model clients
+    - load document parsers
+    """
+
+    configure_logging()
+    yield
+
+
+def create_app() -> FastAPI:
+    settings = get_settings()
+
+    app = FastAPI(
+        title=settings.app_name,
+        version=settings.app_version,
+        lifespan=lifespan,
+    )
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    app.include_router(health.router, prefix="/api/v1")
+    app.include_router(models.router, prefix="/api/v1")
+
+    @app.exception_handler(LLMGatewayError)
+    async def llm_gateway_error_handler(request: Request, exc: LLMGatewayError):
+        """
+        Convert gateway errors into proper HTTP responses.
+
+        Why?
+        ----
+        Clients should not receive raw Python exceptions.
+        They should receive structured API errors.
+        """
+
+        return JSONResponse(
+            status_code=502,
+            content={
+                "detail": str(exc),
+                "path": str(request.url.path),
+            },
+        )
+
+    return app
+
+
+app = create_app()
+```
+
+---
+
+# 8. Environment Example
+
+Create:
+
+```text
+backend/.env.example
+```
+
+Code:
+
+```env
+APP_NAME="Enterprise Agent Platform"
+APP_VERSION=0.1.0
+ENVIRONMENT=dev
+LOG_LEVEL=INFO
+
+CORS_ORIGINS=["http://localhost:3000"]
+
+# Example 1: OpenAI API model
+DEFAULT_LLM_PROVIDER=openai
+DEFAULT_LLM_MODEL=gpt-4o-mini
+DEFAULT_LLM_API_KEY=your_openai_api_key_here
+DEFAULT_LLM_API_BASE=
+DEFAULT_LLM_API_VERSION=
+
+# Example 2: Local Ollama model
+# Uncomment these and comment OpenAI block above if using local model.
+# DEFAULT_LLM_PROVIDER=ollama
+# DEFAULT_LLM_MODEL=ollama/llama3
+# DEFAULT_LLM_API_KEY=
+# DEFAULT_LLM_API_BASE=http://localhost:11434
+# DEFAULT_LLM_API_VERSION=
+
+LLM_TEMPERATURE=0.1
+LLM_MAX_TOKENS=1024
+REQUEST_TIMEOUT_SECONDS=60
+```
+
+Copy to `.env`:
+
+```bash
+cp .env.example .env
+```
+
+Then edit `.env`.
+
+---
+
+# 9. Tests
+
+Create:
+
+```text
+backend/tests/test_health.py
+```
+
+Code:
+
+```python
+from fastapi.testclient import TestClient
+
+from app.main import app
+
+client = TestClient(app)
+
+
+def test_health_check():
+    response = client.get("/api/v1/health")
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["status"] == "ok"
+    assert "app" in data
+    assert "version" in data
+```
+
+Create:
+
+```text
+backend/tests/test_llm_gateway.py
+```
+
+Code:
+
+```python
+from app.core.config import Settings
+from app.schemas.chat import ChatMessage, ChatRequest
+from app.services.llm_gateway import LLMGateway
+
+
+def test_gateway_uses_default_model_when_request_model_is_none():
+    settings = Settings(
+        default_llm_provider="openai",
+        default_llm_model="test-default-model",
+        default_llm_api_key=None,
+        default_llm_api_base=None,
+        llm_temperature=0.1,
+        llm_max_tokens=100,
+    )
+
+    gateway = LLMGateway(settings=settings)
+
+    request = ChatRequest(
+        messages=[
+            ChatMessage(role="user", content="Hello")
+        ]
+    )
+
+    kwargs = gateway._build_kwargs(request)
+
+    assert kwargs["model"] == "test-default-model"
+    assert kwargs["temperature"] == 0.1
+    assert kwargs["max_tokens"] == 100
+    assert kwargs["messages"][0]["role"] == "user"
+    assert kwargs["messages"][0]["content"] == "Hello"
+
+
+def test_gateway_allows_request_model_override():
+    settings = Settings(
+        default_llm_provider="openai",
+        default_llm_model="test-default-model",
+        default_llm_api_key=None,
+        default_llm_api_base=None,
+        llm_temperature=0.1,
+        llm_max_tokens=100,
+    )
+
+    gateway = LLMGateway(settings=settings)
+
+    request = ChatRequest(
+        messages=[
+            ChatMessage(role="user", content="Hello")
+        ],
+        model="override-model",
+        temperature=0.5,
+        max_tokens=50,
+    )
+
+    kwargs = gateway._build_kwargs(request)
+
+    assert kwargs["model"] == "override-model"
+    assert kwargs["temperature"] == 0.5
+    assert kwargs["max_tokens"] == 50
+```
+
+Run tests:
+
+```bash
+pytest
+```
+
+Expected:
+
+```text
+....                                     [100%]
+```
+
+---
+
+# 10. Run the Backend
+
+From `backend/` folder:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+You should see:
+
+```text
+INFO:     Uvicorn running on http://127.0.0.1:8000
+```
+
+Open:
+
+```text
+http://localhost:8000/docs
+```
+
+You will see Swagger UI.
+
+---
+
+# API Endpoints Built in Step 1
+
+## Health
+
+```http
+GET /api/v1/health
+```
+
+Response:
+
+```json
+{
+  "status": "ok",
+  "app": "Enterprise Agent Platform",
+  "version": "0.1.0",
+  "environment": "dev"
+}
+```
+
+---
+
+## Model Config
+
+```http
+GET /api/v1/models/config
+```
+
+Response:
+
+```json
+{
+  "default_provider": "openai",
+  "default_model": "gpt-4o-mini",
+  "api_base_configured": false,
+  "api_key_configured": true,
+  "temperature": 0.1,
+  "max_tokens": 1024
+}
+```
+
+Notice:
+
+We do not return the actual API key.
+
+This is important.
+
+---
+
+## Model Test
+
+```http
+POST /api/v1/models/test
+```
+
+Response:
+
+```json
+{
+  "ok": true,
+  "model": "gpt-4o-mini",
+  "message": "OK"
+}
+```
+
+---
+
+## Chat
+
+```http
+POST /api/v1/models/chat
+```
+
+Request:
+
+```json
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "Say hello in one sentence."
+    }
+  ]
+}
+```
+
+Response:
+
+```json
+{
+  "id": "chatcmpl-abc123",
+  "model": "gpt-4o-mini",
+  "content": "Hello!",
+  "usage": {
+    "prompt_tokens": 12,
+    "completion_tokens": 5,
+    "total_tokens": 17
+  },
+  "provider": "openai"
+}
+```
+
+---
+
+# How to Test with Local Ollama
+
+Install Ollama:
+
+```text
+https://ollama.com
+```
+
+Pull a model:
+
+```bash
+ollama pull llama3
+```
+
+Set `.env`:
+
+```env
+DEFAULT_LLM_PROVIDER=ollama
+DEFAULT_LLM_MODEL=ollama/llama3
+DEFAULT_LLM_API_KEY=
+DEFAULT_LLM_API_BASE=http://localhost:11434
+```
+
+Restart backend:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Test:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/models/test
+```
+
+Expected:
+
+```json
+{
+  "ok": true,
+  "model": "ollama/llama3",
+  "message": "OK"
+}
+```
+
+---
+
+# How to Test with OpenAI
+
+Set `.env`:
+
+```env
+DEFAULT_LLM_PROVIDER=openai
+DEFAULT_LLM_MODEL=gpt-4o-mini
+DEFAULT_LLM_API_KEY=sk-your-key-here
+DEFAULT_LLM_API_BASE=
+```
+
+Restart backend.
+
+Test:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/models/test
+```
+
+---
+
+# Correctness Checklist for Step 1
+
+Your Step 1 is correct if all these pass:
+
+## Backend starts
+
+```bash
+uvicorn app.main:app --reload
+```
+
+No import errors.
+
+---
+
+## Docs page opens
+
+```text
+http://localhost:8000/docs
+```
+
+You see endpoints:
+
+- `/api/v1/health`
+- `/api/v1/models/config`
+- `/api/v1/models/test`
+- `/api/v1/models/chat`
+
+---
+
+## Health works
+
+```bash
+curl http://localhost:8000/api/v1/health
+```
+
+Returns:
+
+```json
+{
+  "status": "ok"
+}
+```
+
+---
+
+## Model config does not leak secret
+
+```bash
+curl http://localhost:8000/api/v1/models/config
+```
+
+Should show:
+
+```json
+"api_key_configured": true
+```
+
+but not the actual key.
+
+---
+
+## Model test works
+
+For OpenAI or Ollama:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/models/test
+```
+
+Returns OK.
+
+---
+
+## Chat works
+
+```bash
+curl -X POST http://localhost:8000/api/v1/models/chat \
+-H "Content-Type: application/json" \
+-d '{
+  "messages": [
+    {
+      "role": "user",
+      "content": "Reply with only: Platform ready"
+    }
+  ]
+}'
+```
+
+Returns model response.
+
+---
+
+## Tests pass
+
+```bash
+pytest
+```
+
+All tests pass.
+
+---
+
+# Important Design Notes
+
+## 1. Low temperature is intentional
+
+We set:
+
+```env
+LLM_TEMPERATURE=0.1
+```
+
+Why?
+
+Because HR and Finance need factual accuracy.
+
+High temperature creates creative but unreliable answers.
+
+For document review, we want deterministic behaviour.
+
+---
+
+## 2. We are not storing documents yet
+
+This is correct.
+
+Step 1 is only about proving the model plugin gateway.
+
+Do not add document upload yet. That comes in Step 2/3.
+
+---
+
+## 3. We are not adding authentication yet
+
+Also correct.
+
+First make the core engine work.
+
+Then add:
+
+- users
+- workspaces
+- roles
+- permissions
+- audit logs
+
+---
+
+## 4. Request-level model override is temporary
+
+Right now, request can include:
+
+```json
+{
+  "model": "some-model"
+}
+```
+
+For MVP/demo this is fine.
+
+For enterprise production, we should later replace this with:
+
+```text
+ModelProfile
+```
+
+stored securely in database.
+
+Example:
+
+```text
+Workspace: HR Onboarding
+Allowed model profile: Private Llama 3 Local
+```
+
+The user should not freely choose any model unless permitted.
+
+---
+
+# What You Learned in Step 1
+
+You now have:
+
+- a clean backend structure
+- configuration management
+- logging
+- request validation
+- service layer separation
+- model gateway abstraction
+- local/API model support
+- tests
+- Swagger API docs
+
+This is the foundation.
+
+---
+
+# Common Mistakes to Avoid
+
+## Mistake 1: Putting model logic inside route
+
+Bad:
+
+```python
+@router.post("/chat")
+async def chat(...):
+    response = await acompletion(...)
+```
+
+Good:
+
+```python
+@router.post("/chat")
+async def chat(...):
+    return await gateway.chat(request)
+```
+
+Why?
+
+Routes should handle HTTP.
+Services should handle business logic.
+
+---
+
+## Mistake 2: Reading env variables everywhere
+
+Bad:
+
+```python
+os.getenv("DEFAULT_LLM_MODEL")
+```
+
+Good:
+
+```python
+settings.default_llm_model
+```
+
+Why?
+
+Typed, centralized, testable configuration.
+
+---
+
+## Mistake 3: Returning API keys in API response
+
+Never do this:
+
+```json
+{
+  "api_key": "sk-..."
+}
+```
+
+Only return:
+
+```json
+{
+  "api_key_configured": true
+}
+```
+
+---
+
+## Mistake 4: Using high temperature for HR/Finance
+
+Bad:
+
+```env
+LLM_TEMPERATURE=1.2
+```
+
+Good:
+
+```env
+LLM_TEMPERATURE=0.1
+```
+
+---
+
+# Suggested README for Backend
+
+Create:
+
+```text
+backend/README.md
+```
+
+Code:
+
+```md
+# Enterprise Agent Platform Backend
+
+## Step 1: BYOM Model Gateway
+
+This backend provides the foundation for an enterprise AI agent platform focused on HR and Finance document intelligence.
+
+## Features in Step 1
+
+- FastAPI backend
+- Environment-based configuration
+- Central logging
+- Model gateway supporting local and API models
+- Health check endpoint
+- Model config endpoint
+- Model test endpoint
+- Chat endpoint
+- Basic tests
+
+## Setup
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+uvicorn app.main:app --reload
+```
+
+## Test
+
+```bash
+pytest
+```
+
+## API Docs
+
+```text
+http://localhost:8000/docs
+```
+```
+
+---
+
+# Next Step After Step 1
+
+Once Step 1 is working, we move to:
+
+## Step 2: Workspace + Document Storage
+
+In Step 2 we will build:
+
+- PostgreSQL database connection
+- Workspace model
+- Document model
+- Upload API
+- folder/workspace isolation
+- metadata storage
+
+We will not jump directly to vector database yet.
+
+First we need proper storage structure:
+
+```text
+Workspace
+└── Documents
+    └── Pages/Chunks
+```
+
+This is important for HR/Finance because documents belong to cases, candidates, audits, vendors, invoices, etc.
+
+---
+
+# Your Task Now
+
+Do this:
+
+1. Create the backend folder structure.
+2. Add all files above.
+3. Install dependencies.
+4. Run:
+
+```bash
+pytest
+```
+
+5. Run:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+6. Open:
+
+```text
+http://localhost:8000/docs
+```
+
+7. Test with either OpenAI or Ollama.
+
+Then reply to me with one of these:
+
+### Option A: Success
+
+```text
+Step 1 completed successfully.
+```
+
+Then I will give you Step 2 with full code and explanation.
+
+### Option B: Error
+
+Paste the exact error message, for example:
+
+```text
+ImportError
+ModuleNotFoundError
+pytest failed
+Ollama connection refused
+OpenAI authentication error
+```
+
+I will help you fix it and explain why it happened.
