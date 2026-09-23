@@ -1,0 +1,156 @@
+:root {
+  --bg: #0f172a;
+  --panel: #1e293b;
+  --panel-2: #273449;
+  --border: #334155;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --accent: #38bdf8;
+  --accent-2: #6366f1;
+  --danger: #f87171;
+  --success: #34d399;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.layout { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 230px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.sidebar .brand {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 18px;
+  letter-spacing: 0.3px;
+}
+
+.sidebar nav a {
+  display: block;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.sidebar nav a:hover { background: var(--panel-2); text-decoration: none; }
+.sidebar nav a.active { background: var(--accent-2); color: #fff; }
+
+.main { flex: 1; padding: 28px 34px; max-width: 1100px; }
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.topbar .user { color: var(--muted); font-size: 14px; }
+
+h1 { font-size: 24px; margin-bottom: 16px; }
+h2 { font-size: 18px; margin-bottom: 12px; }
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+
+button {
+  background: var(--accent-2);
+  color: #fff;
+  border: none;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+button:hover { opacity: 0.9; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+button.secondary { background: var(--panel-2); border: 1px solid var(--border); }
+button.danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+button.small { padding: 5px 10px; font-size: 12px; }
+
+input, select, textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+
+.form-row { max-width: 420px; }
+
+.error { color: var(--danger); font-size: 14px; margin: 10px 0; }
+.success { color: var(--success); font-size: 14px; margin: 10px 0; }
+.muted { color: var(--muted); font-size: 13px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 600; font-size: 13px; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+}
+.badge.new { color: var(--muted); }
+.badge.processed { color: #fbbf24; }
+.badge.indexed { color: var(--success); }
+.badge.failed { color: var(--danger); }
+
+.auth-box {
+  max-width: 400px;
+  margin: 8vh auto;
+}
+
+.chat { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+.chat .msg { padding: 12px 14px; border-radius: 12px; max-width: 85%; white-space: pre-wrap; line-height: 1.5; }
+.chat .msg.user { background: var(--accent-2); color: #fff; align-self: flex-end; }
+.chat .msg.assistant { background: var(--panel-2); align-self: flex-start; }
+
+.citation {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.search-result { border-left: 3px solid var(--accent); padding-left: 12px; margin-bottom: 14px; }
+
+.flex { display: flex; gap: 10px; align-items: center; }
+.grow { flex: 1; }
